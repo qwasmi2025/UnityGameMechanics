@@ -1,0 +1,79 @@
+﻿// GPU Instancer Pro
+// Copyright (c) GurBu Technologies
+
+#include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/PlatformDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/Matrix.hlsl"
+#include "Packages/com.gurbu.gpui-pro.crowd-animations/Runtime/Compute/Include/GPUICrowdDefines.hlsl"
+
+#pragma kernel CSAnimateBones
+
+// Output
+uniform RWStructuredBuffer<GPUITransformData> boneDataBuffer;
+
+// Inputs
+uniform StructuredBuffer<float4> clipFramesAndWeightsBuffer; // index 0: frameNo1-4
+                                                             // index 1: weight1-4
+uniform StructuredBuffer<GPUICrowdInstanceData> crowdInstanceBuffer;
+uniform StructuredBuffer<GPUITransformData> bakedAnimationClipData;
+uniform uint boneCount;
+uniform uint instanceCount;
+uniform uint startIndex;
+
+GPUITransformData LerpTransformData(GPUITransformData td1, GPUITransformData td2, float t)
+{
+    GPUITransformData result;
+    result.position = lerp(td1.position, td2.position, t);
+    result.rotation = QuaternionSlerp(td1.rotation, td2.rotation, t);
+    result.scale = lerp(td1.scale, td2.scale, t);
+    return result;
+}
+
+GPUITransformData GetBakedBoneTransform(float frameNo, int boneIndex)
+{
+    uint frameStart = floor(frameNo);
+    float progress = frac(frameNo);
+    GPUITransformData result = bakedAnimationClipData[frameStart * boneCount + boneIndex];
+    if (progress > 0.0)
+        result = LerpTransformData(result, bakedAnimationClipData[(frameStart + 1) * boneCount + boneIndex], progress);
+    return result;
+}
+
+GPUITransformData CalculateBoneTransform(float4 activeClipFrames, float4 activeClipWeights, uint boneIndex)
+{   
+    float totalWeight = 0;
+    GPUITransformData frameTransform = identityGPUITransform;
+    [unroll]
+    for (uint i = 0; i < 4; i++)
+    {
+        float weight = activeClipWeights[i];
+        float frameNo = activeClipFrames[i];
+        if (weight > 0.001 && frameNo >= 0)
+        {
+            totalWeight += weight;
+            if (totalWeight == weight)
+                frameTransform = GetBakedBoneTransform(frameNo, boneIndex);
+            else
+                frameTransform = LerpTransformData(frameTransform, GetBakedBoneTransform(frameNo, boneIndex), weight / totalWeight);
+        }
+    }
+    return frameTransform;
+}
+
+[numthreads(GPUI_THREADS_2D, GPUI_THREADS_2D, 1)]
+void CSAnimateBones(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= instanceCount || id.y >= boneCount)
+        return;
+    int index = id.x + startIndex;
+    if (!GPUI_CROWD_IsBakedAnimator(crowdInstanceBuffer[index].animatorWorkflowID))
+        return;
+    
+    uint instanceIndex = index * 2;
+    float4 activeClipWeights = clipFramesAndWeightsBuffer[instanceIndex + 1];
+    if (length(activeClipWeights) <= 0)
+        return;
+    float4 activeClipFrames = clipFramesAndWeightsBuffer[instanceIndex];
+    
+    // lerp from previous state disabled because it is causing problem on initialization
+    boneDataBuffer[id.y + boneCount * (startIndex + id.x)] = CalculateBoneTransform(activeClipFrames, activeClipWeights, id.y);
+}

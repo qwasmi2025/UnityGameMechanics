@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!200 &20000000
+ShaderVariantCollection:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GPUIShaderVariantCollection
+  m_Shaders:
+  - first: {fileID: 4800000, guid: 8478781d80234fa29651593b02782b9d, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: 303b28effad14e94871a6cfad2db6615, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: -6465566751694194690, guid: 78f1b5ae9238ef140869bdba4aef19db, type: 3}
+    second:
+      variants:
+      - keywords: 
+        passType: 0
+  - first: {fileID: 4800000, guid: 0c91918b641d20f4292ba6a1a9185859, type: 3}
+    second:
+      variants:
+      - keywords: _ENVIRONMENTREFLECTIONS_OFF
+        passType: 0
+  - first: {fileID: 4800000, guid: d5e27e31389b48b43b68847c23616d49, type: 3}
+    second:
+      variants:
+      - keywords: GPUI_OBJECT_MOTION_VECTOR_ON _EMISSION _METALLICSPECGLOSSMAP _NORMALMAP
+        passType: 0
+      - keywords: _EMISSION _METALLICSPECGLOSSMAP _NORMALMAP
+        passType: 0

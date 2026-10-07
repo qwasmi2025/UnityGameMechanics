@@ -1,0 +1,27 @@
+{
+    "name": "PlagueRats.Runtime",
+    "rootNamespace": "PlagueRats",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Mathematics",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "GPUInstancerPro.Core",
+        "GPUInstancerPro.CrowdAnimations"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.gurbu.gpui-pro",
+            "expression": "",
+            "define": "GPUI_PRO"
+        }
+    ],
+    "noEngineReferences": false
+}

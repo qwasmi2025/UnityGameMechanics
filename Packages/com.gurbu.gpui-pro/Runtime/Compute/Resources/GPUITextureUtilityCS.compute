@@ -1,0 +1,55 @@
+﻿// GPU Instancer Pro
+// Copyright (c) GurBu Technologies
+
+
+#include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/PlatformDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/GPUIDefines.hlsl"
+
+#pragma kernel CSCopyTexture
+#pragma kernel CSCopyTextureWithSampler
+#pragma kernel CSWriteToTextureSingleChannel
+
+uniform Texture2D<float4> source;
+uniform SamplerState sampler_source;
+uniform RWTexture2D<float4> destination;
+uniform uint offsetX;
+uniform uint offsetY;
+uniform uint sourceSizeX;
+uniform uint sourceSizeY;
+
+uniform StructuredBuffer<float> textureDataSingleChannel;
+uniform uint destinationSizeX;
+uniform uint destinationSizeY;
+uniform float multiplier;
+
+[numthreads(GPUI_THREADS_2D, GPUI_THREADS_2D, 1)]
+void CSCopyTexture(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= sourceSizeX || id.y >= sourceSizeY)
+        return;
+
+    uint indexX = id.x + offsetX;
+    uint indexY = id.y + offsetY;
+
+    destination[uint2(indexX, indexY)] = source[id.xy];
+}
+
+[numthreads(GPUI_THREADS_2D, GPUI_THREADS_2D, 1)]
+void CSCopyTextureWithSampler(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= destinationSizeX || id.y >= destinationSizeY)
+        return;
+
+    destination[id.xy] = source.SampleLevel(sampler_source, float2((id.x + 0.5) / float(destinationSizeX), (id.y + 0.5) / float(destinationSizeY)), 0);
+}
+
+[numthreads(GPUI_THREADS_2D, GPUI_THREADS_2D, 1)]
+void CSWriteToTextureSingleChannel(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= destinationSizeX || id.y >= destinationSizeY)
+        return;
+
+    float colorValue = textureDataSingleChannel[id.y * destinationSizeX + id.x] * multiplier;
+    destination[uint2(id.x + offsetX, id.y + offsetY)] = float4(colorValue, colorValue, colorValue, colorValue);
+
+}

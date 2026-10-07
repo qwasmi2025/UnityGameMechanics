@@ -1,0 +1,37 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.gurbu.gpui-pro/Editor/UI/GPUIEditorStyle.uss?fileID=7433441132597879392&amp;guid=a2a4445c56ecf5c47947568de4aa6d27&amp;type=3#GPUIEditorStyle" />
+    <Style src="project://database/Packages/com.gurbu.gpui-pro.crowd-animations/Editor/UI/GPUICrowdEditorStyle.uss?fileID=7433441132597879392&amp;guid=831b1278044b5064783069e5a36fb3cf&amp;type=3#GPUICrowdEditorStyle" />
+    <GPUInstancerPro.GPUIHelpBox message-type="Info" help-text="&lt;b&gt;R: Read from Bone Transforms.&lt;/b&gt; The system reads bone transforms and writes them to GPU buffers (e.g., for applying IK with Mecanim Reader).\n\n&lt;b&gt;W: Write to Bone Transforms.&lt;/b&gt; The system calculates transform data from baked animation and applies it to bone transforms (e.g., for Bone Attachments with Compute Animator)." name="GPUIHelpBox" />
+    <ui:VisualElement class="gpui-bg-light gpui-crowd-bones">
+        <ui:VisualElement name="Titles" style="flex-direction: row; border-top-width: 1px; border-right-width: 1px; border-left-width: 1px; border-top-left-radius: 6px; border-top-right-radius: 6px;">
+            <ui:Label tabindex="-1" text="R" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Read from Transform" style="-unity-text-align: middle-center; width: 30px; max-width: 30px; min-width: 30px; height: 30px; max-height: 30px; min-height: 30px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; border-right-width: 1px;" />
+            <ui:Label tabindex="-1" text="W" parse-escape-sequences="true" display-tooltip-when-elided="true" tooltip="Write to Transform" style="width: 30px; -unity-text-align: middle-center; max-width: 30px; min-width: 30px; height: 30px; max-height: 30px; min-height: 30px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; border-right-width: 1px;" />
+            <ui:Label tabindex="-1" text="Bone Name" parse-escape-sequences="true" display-tooltip-when-elided="true" style="-unity-text-align: middle-center; flex-grow: 1; height: 30px; max-height: 30px; min-height: 30px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Bones" style="flex-direction: row; flex-grow: 1; border-top-width: 0; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-bottom-right-radius: 6px; border-bottom-left-radius: 6px;">
+            <ui:VisualElement name="ReadToggles" style="width: 30px; max-width: 30px; min-width: 30px; align-items: center; border-right-width: 1px;">
+                <ui:Toggle class="gpui-crowd-bone-toggle" style="visibility: hidden;" />
+                <ui:Toggle class="gpui-crowd-bone-toggle" />
+                <ui:Toggle class="gpui-crowd-bone-toggle" />
+            </ui:VisualElement>
+            <ui:VisualElement name="WriteToggles" style="width: 30px; max-width: 30px; min-width: 30px; border-right-width: 1px;">
+                <ui:Toggle class="gpui-crowd-bone-toggle" style="visibility: hidden;" />
+                <ui:Toggle class="gpui-crowd-bone-toggle" />
+                <ui:Toggle class="gpui-crowd-bone-toggle" />
+            </ui:VisualElement>
+            <ui:VisualElement name="BoneNames" style="flex-grow: 1;">
+                <ui:Foldout text="Foldout" class="gpui-crowd-bone-foldout" />
+                <ui:Foldout text="Foldout" class="gpui-crowd-bone-foldout" />
+                <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" class="gpui-crowd-bone-label">
+                    <uie:ObjectField class="gpui-crowd-bone-transform" />
+                </ui:Label>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="FoldoutButtons" style="flex-direction: row; margin-top: 5px; flex-wrap: wrap;">
+        <ui:Button text="Expand All" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ExpandAllButton" focusable="false" />
+        <ui:Button text="Collapse All" parse-escape-sequences="true" display-tooltip-when-elided="true" name="CollapseAllButton" focusable="false" />
+        <ui:Button text="Clear All Read [0]" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ClearReadButton" focusable="false" style="display: none;" />
+        <ui:Button text="Clear All Write [0]" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ClearWriteButton" focusable="false" style="display: none;" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,14 @@
+{
+    "name": "PlagueRats.Editor",
+    "rootNamespace": "PlagueRats.EditorTools",
+    "references": [
+        "PlagueRats.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "autoReferenced": true,
+    "noEngineReferences": false
+}

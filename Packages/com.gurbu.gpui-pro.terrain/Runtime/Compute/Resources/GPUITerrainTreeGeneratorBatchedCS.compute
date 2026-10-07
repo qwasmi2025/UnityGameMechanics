@@ -1,0 +1,88 @@
+﻿// GPU Instancer Pro
+// Copyright (c) GurBu Technologies
+
+
+#include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/PlatformDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/GPUIDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/Matrix.hlsl"
+#include "Packages/com.gurbu.gpui-pro.terrain/Runtime/Compute/Include/GPUITerrainDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro.terrain/Runtime/Compute/Include/Terrain.hlsl"
+
+#pragma kernel CSTreeGenerationBatchedKernel
+
+#pragma multi_compile _ GPUI_TRANSFORM_OFFSET
+
+#ifdef __INTELLISENSE__
+#define GPUI_TRANSFORM_OFFSET
+#endif 
+
+struct GPUITreeTerrainData
+{
+    float3 terrainSize;
+    float3 terrainPosition;
+    uint treeDataStartIndex;
+    uint treeCount;
+    float4x4 gpuiTransformOffset;
+};
+
+// Result buffers
+uniform RWStructuredBuffer<float4x4> gpuiTransformBuffer;
+uniform RWStructuredBuffer<uint> counterBuffer;
+
+// Input buffers
+uniform StructuredBuffer<TerrainTreeInstance> treeData;
+uniform StructuredBuffer<GPUITreeTerrainData> terrainDataBuffer;
+
+uniform uint bufferSize;
+uniform uint terrainDataCount;
+uniform uint transformBufferStartIndex;
+uniform uint prototypeIndex;
+uniform uint prototypeCount;
+uniform float3 prefabScale;
+uniform bool applyRotation;
+uniform bool applyHeight;
+
+[numthreads(GPUI_THREADS_2D, GPUI_THREADS_2D, 1)]
+void CSTreeGenerationBatchedKernel(uint3 id : SV_DispatchThreadID)
+{
+    if (id.y >= terrainDataCount)
+        return;
+    
+    GPUITreeTerrainData terrainData = terrainDataBuffer[id.y];
+    
+    if (id.x >= terrainData.treeCount)
+        return;
+    
+    TerrainTreeInstance treeInstance = treeData[terrainData.treeDataStartIndex + id.x];
+    
+    int terrainPrototypeIndex = counterBuffer[prototypeCount + id.y * prototypeCount + prototypeIndex];
+    if (treeInstance.prototypeIndex != terrainPrototypeIndex)
+        return;
+    
+    uint index;
+    InterlockedAdd(counterBuffer[prototypeIndex], 1, index);
+    
+    float4x4 rotation = identityMatrix;
+    if (applyRotation)
+        rotation = MatrixRotate(vector3Up, treeInstance.rotation);
+    
+    float3 scale = vector3One;
+    if (applyHeight)
+        scale = float3(treeInstance.widthScale, treeInstance.heightScale, treeInstance.widthScale);
+    scale *= prefabScale;
+    
+    float3 position = float3(
+            treeInstance.position.x * terrainData.terrainSize.x,
+            treeInstance.position.y * terrainData.terrainSize.y,
+            treeInstance.position.z * terrainData.terrainSize.z
+            );
+    
+    float4x4 transformMatrix = TRS(position, rotation, scale);
+#ifdef GPUI_TRANSFORM_OFFSET
+    transformMatrix = mul(terrainData.gpuiTransformOffset, transformMatrix);
+    transformMatrix._14_24_34 -= terrainData.gpuiTransformOffset._14_24_34;
+#endif
+    transformMatrix._14_24_34 += terrainData.terrainPosition;
+    
+    gpuiTransformBuffer[index + transformBufferStartIndex] = transformMatrix;
+}

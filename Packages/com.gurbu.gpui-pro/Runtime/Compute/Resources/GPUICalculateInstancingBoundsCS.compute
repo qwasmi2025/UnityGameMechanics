@@ -1,0 +1,119 @@
+﻿// GPU Instancer Pro
+// Copyright (c) GurBu Technologies
+
+#pragma kernel CSCalculateInstancingBounds
+
+#include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/PlatformDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/GPUIDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/Matrix.hlsl"
+
+#define GPUI_UINT_MAX 4294967295
+
+RWStructuredBuffer<float4x4> gpuiTransformBuffer;
+RWStructuredBuffer<uint> gpuiBoundsMinMax; // Encoding values to uint due to InterlockedMin/Max functionality limitations depending on the Graphics API.
+
+uniform uint bufferSize;
+uniform uint startIndex;
+uniform float3 boundsCenter;
+uniform float3 boundsExtents;
+
+groupshared uint3 sMin[GPUI_THREADS];
+groupshared uint3 sMax[GPUI_THREADS];
+
+uint encodeToUint(int x)
+{
+    return asuint(x) ^ 0x80000000;
+}
+
+[numthreads(GPUI_THREADS, 1, 1)]
+void CSCalculateInstancingBounds(uint3 id : SV_DispatchThreadID, uint gtid : SV_GroupThreadID)
+{
+    // Per-thread initial values (neutral so they don't affect min/max if skipped)
+    uint3 minInt = uint3(GPUI_UINT_MAX, GPUI_UINT_MAX, GPUI_UINT_MAX);
+    uint3 maxInt = uint3(0, 0, 0);
+
+    if (id.x < bufferSize)
+    {
+        float4x4 transformData = gpuiTransformBuffer[id.x];
+
+        // Skip zero scale or unset matrix
+        float3 sc = GetScale(transformData);
+        if (sc.x > 0.0 && sc.y > 0.0 && sc.z > 0.0 && transformData._44 > 0.5)
+        {
+            // World center
+            float3 worldCenter = mul(transformData, float4(boundsCenter, 1.0)).xyz;
+
+            // Extract world-space basis (columns of 3x3 part)
+            float3 ax = abs(float3(transformData._11, transformData._21, transformData._31)); // X axis column
+            float3 ay = abs(float3(transformData._12, transformData._22, transformData._32)); // Y axis column
+            float3 az = abs(float3(transformData._13, transformData._23, transformData._33)); // Z axis column
+
+            float3 worldExtents = ax * boundsExtents.x
+                                + ay * boundsExtents.y
+                                + az * boundsExtents.z;
+
+            float3 worldMin = worldCenter - worldExtents;
+            float3 worldMax = worldCenter + worldExtents;
+
+            // Integerize with true lower/upper bounds
+            minInt = uint3(encodeToUint(floor(worldMin.x)), encodeToUint(floor(worldMin.y)), encodeToUint(floor(worldMin.z)));
+            maxInt = uint3(encodeToUint(ceil(worldMax.x)), encodeToUint(ceil(worldMax.y)), encodeToUint(ceil(worldMax.z)));
+        }
+    }
+
+    // Write into shared memory
+    sMin[gtid] = minInt;
+    sMax[gtid] = maxInt;
+    
+    if (id.x == 0)
+    {
+        gpuiBoundsMinMax[startIndex + 0] = GPUI_UINT_MAX;
+        gpuiBoundsMinMax[startIndex + 1] = GPUI_UINT_MAX;
+        gpuiBoundsMinMax[startIndex + 2] = GPUI_UINT_MAX;
+        gpuiBoundsMinMax[startIndex + 3] = 0;
+        gpuiBoundsMinMax[startIndex + 4] = 0;
+        gpuiBoundsMinMax[startIndex + 5] = 0;
+    }
+    GroupMemoryBarrierWithGroupSync();
+    
+    // Parallel reduction in shared memory
+    // After this loop, lane 0 holds the group's AABB
+    for (uint stride = GPUI_THREADS >> 1; stride > 0; stride >>= 1)
+    {
+        if (gtid < stride)
+        {
+            sMin[gtid] = uint3(min(sMin[gtid].x, sMin[gtid + stride].x),
+                              min(sMin[gtid].y, sMin[gtid + stride].y),
+                              min(sMin[gtid].z, sMin[gtid + stride].z));
+
+            sMax[gtid] = uint3(max(sMax[gtid].x, sMax[gtid + stride].x),
+                              max(sMax[gtid].y, sMax[gtid + stride].y),
+                              max(sMax[gtid].z, sMax[gtid + stride].z));
+        }
+        GroupMemoryBarrierWithGroupSync();
+    }
+
+    // Only one thread per group hits the global atomics
+    if (gtid == 0)
+    {
+        uint3 gMin = sMin[0];
+        uint3 gMax = sMax[0];
+
+        int tmp; // required output param
+
+        // Early-out checks to avoid useless atomics
+        if (gMin.x < gpuiBoundsMinMax[startIndex + 0])
+            InterlockedMin(gpuiBoundsMinMax[startIndex + 0], gMin.x, tmp);
+        if (gMin.y < gpuiBoundsMinMax[startIndex + 1])
+            InterlockedMin(gpuiBoundsMinMax[startIndex + 1], gMin.y, tmp);
+        if (gMin.z < gpuiBoundsMinMax[startIndex + 2])
+            InterlockedMin(gpuiBoundsMinMax[startIndex + 2], gMin.z, tmp);
+
+        if (gMax.x > gpuiBoundsMinMax[startIndex + 3])
+            InterlockedMax(gpuiBoundsMinMax[startIndex + 3], gMax.x, tmp);
+        if (gMax.y > gpuiBoundsMinMax[startIndex + 4])
+            InterlockedMax(gpuiBoundsMinMax[startIndex + 4], gMax.y, tmp);
+        if (gMax.z > gpuiBoundsMinMax[startIndex + 5])
+            InterlockedMax(gpuiBoundsMinMax[startIndex + 5], gMax.z, tmp);
+    }
+}

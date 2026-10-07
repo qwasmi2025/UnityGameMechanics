@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.gurbu.gpui-pro/Editor/UI/GPUIEditorStyle.uss?fileID=7433441132597879392&amp;guid=a2a4445c56ecf5c47947568de4aa6d27&amp;type=3#GPUIEditorStyle" />
+    <Style src="project://database/Packages/com.gurbu.gpui-pro.crowd-animations/Editor/UI/GPUICrowdEditorStyle.uss?fileID=7433441132597879392&amp;guid=831b1278044b5064783069e5a36fb3cf&amp;type=3#GPUICrowdEditorStyle" />
+    <ui:VisualElement style="flex-direction: row;">
+        <ui:VisualElement name="ClipsVE" style="flex-grow: 1;">
+            <ui:Label tabindex="-1" text="Clips" style="-unity-text-align: middle-center; -unity-font-style: bold;" />
+            <uie:ObjectField name="Clip1OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" binding-path="clip1" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <uie:ObjectField name="Clip2OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" binding-path="clip2" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <uie:ObjectField name="Clip3OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" binding-path="clip3" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <uie:ObjectField name="Clip4OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" binding-path="clip4" style="height: 20px; max-height: 20px; min-height: 20px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="WeightsVE" style="flex-grow: 1; margin-left: 20px;">
+            <ui:Label tabindex="-1" text="Weights" style="-unity-text-align: middle-center; min-width: 40px; -unity-font-style: bold;" />
+            <ui:Slider high-value="1" show-input-field="true" binding-path="weights.x" name="Clip1Weight" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" binding-path="weights.y" name="Clip2Weight" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" binding-path="weights.z" name="Clip3Weight" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" binding-path="weights.w" name="Clip4Weight" style="height: 20px; max-height: 20px; min-height: 20px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="SpeedsVE" style="flex-grow: 1; margin-left: 20px; max-width: 80px;">
+            <ui:Label tabindex="-1" text="Speeds" style="-unity-text-align: middle-center; min-width: 40px; -unity-font-style: bold;" />
+            <ui:FloatField binding-path="speeds.x" name="Clip1Speed" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:FloatField binding-path="speeds.y" name="Clip2Speed" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:FloatField binding-path="speeds.z" name="Clip3Speed" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:FloatField binding-path="speeds.w" name="Clip4Speed" style="height: 20px; max-height: 20px; min-height: 20px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement style="flex-direction: row; margin-top: 10px;">
+        <ui:FloatField label="Transition Time" value="42.2" binding-path="transitionTime" name="TransitionTime" style="margin-left: 0; width: 160px; max-height: 20px; min-height: 20px; flex-direction: row-reverse; -unity-text-align: middle-left;" />
+        <ui:Toggle label="Force Looping" binding-path="forceLooping" name="ForceLooping" style="margin-left: 30px; width: 160px; max-height: 20px; min-height: 20px; flex-direction: row-reverse; -unity-text-align: middle-left;" />
+        <ui:Toggle label="Sync Time" binding-path="isSyncTime" name="IsSync" style="margin-left: 30px; width: 160px; max-height: 20px; min-height: 20px; flex-direction: row-reverse; -unity-text-align: middle-left;" />
+    </ui:VisualElement>
+    <ui:Button text="Play Animation" parse-escape-sequences="true" display-tooltip-when-elided="true" name="PlayButton" focusable="false" class="gpui-action-button" style="margin-top: 10px;" />
+</ui:UXML>

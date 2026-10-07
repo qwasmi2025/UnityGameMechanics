@@ -1,0 +1,14 @@
+BEGIN_OPTIONS
+    Stackable "False"
+END_OPTIONS
+
+BEGIN_CODE
+    #include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Shaders/Include/GPUInstancerSetup.hlsl"
+    #include_with_pragmas "Packages/com.gurbu.gpui-pro.crowd-animations/Runtime/Shaders/Include/GPUICrowdSetup.hlsl"
+    #pragma instancing_options procedural:setupGPUI
+
+    void ModifyVertex (inout VertexData v, inout ExtraV2F d)
+    {
+        GPUI_CROWD_VERTEX(v.vertexID, v.vertex.xyz, v.normal.xyz, v.tangent.xyz);
+    }
+END_CODE

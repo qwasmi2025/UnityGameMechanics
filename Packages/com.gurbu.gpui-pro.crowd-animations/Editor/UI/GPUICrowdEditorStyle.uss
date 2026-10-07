@@ -1,0 +1,66 @@
+.gpui-crowd-bones {
+    border-color: rgb(40, 40, 40);
+    border-left-color: rgb(40, 40, 40);
+    border-right-color: rgb(40, 40, 40);
+    border-top-color: rgb(40, 40, 40);
+    border-bottom-color: rgb(40, 40, 40);
+}
+
+.gpui-crowd-bones * {
+    border-color: rgb(40, 40, 40);
+    border-left-color: rgb(40, 40, 40);
+    border-right-color: rgb(40, 40, 40);
+    border-top-color: rgb(40, 40, 40);
+    border-bottom-color: rgb(40, 40, 40);
+}
+
+.gpui-crowd-bone-toggle {
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    width: 30px;
+    height: 30px;
+    max-width: 30px;
+    max-height: 30px;
+    flex-direction: row;
+    border-top-width: 1px;
+}
+
+.gpui-crowd-bone-toggle * {
+    flex-direction: row;
+    justify-content: center;
+    align-self: center;
+}
+
+.gpui-crowd-bone-foldout {
+    height: 30px;
+    max-height: 30px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    flex-direction: row;
+    border-top-width: 1px;
+    flex-grow: 1;
+}
+
+.gpui-crowd-bone-label {
+    margin-left: 0;
+    flex-direction: row;
+    height: 30px;
+    max-height: 30px;
+    -unity-text-align: middle-left;
+    border-top-width: 1px;
+}
+
+.gpui-crowd-bone-transform {
+    position: absolute;
+    right: 10px;
+    bottom: 4px;
+    flex-grow: 1;
+    min-width: 120px;
+    width: 120px;
+    max-width: 120px;
+    top: 4px;
+}

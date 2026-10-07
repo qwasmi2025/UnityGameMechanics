@@ -1,0 +1,30 @@
+﻿Error[6102]|Error[6102]|Error[6102]|Bone Tracker workflow requires the bone transforms. Please disable the Optimize Game Objects option on the character model for faster initialization.|
+Error[6103]|Error[6103]|Error[6103]|Crowd instances require the Read/Write option to be enabled in the Model Importer settings!|
+clipList|Animation Clips|||
+defaultClipIndex|Default Clip Index|||
+boneIndexUV|Bone Index UV|||
+boneWeightUV|Bone Weight UV|||
+animatorWorkflowID|Animator Workflow|Determines how bone transform data is provided for GPU skinning. The workflow selected on the prefab acts as the default, but individual instances in the scene can override this without increasing draw call counts.| Determines how bone transform data is provided for GPU skinning. The workflow selected on the prefab acts as the default, but individual instances in the scene can override this without increasing draw call counts. See the documentation for detailed descriptions of each available workflow.|https://wiki.gurbu.com/index.php?title=GPU_Instancer_Pro-Crowd_Animations#Animator_Workflows
+boneTransforms|Bone Transforms|||
+isBakeEnabled|Bake Enabled|||
+crowdRig|Crowd Rig|The Crowd Rig stores essential data for skinned mesh rendering, including bone hierarchies, bind poses, and skinning metadata. It also manages baked animation clips at runtime, serving as the core data asset used by Crowd Animations workflows.|The Crowd Rig stores essential data for skinned mesh rendering, including bone hierarchies, bind poses, and skinning metadata. It also manages baked animation clips at runtime, serving as the core data asset used by Crowd Animations workflows.|
+bones|Bones|||
+skinnedMeshes|Skinned Meshes|||
+bindPoseDataList|Bind Pose List|||
+applyRootMotion|Apply Root Motion|Enables root motion calculation when using the Compute Animator workflow. This allows characters to move based on animation data.|Enables root motion calculation when using the Compute Animator workflow. This allows characters to move based on animation data.|
+crowdSelectPrefab|Crowd Select Prefab|Use the <b>Crowd Instance</b> component on the prefab to modify animation settings.|Use the <b>Crowd Instance</b> component on the prefab to modify animation settings.|
+createCrowdRigInfo|Create Rig Data|Create a <b>Rig Data</b> to add custom settings. Otherwise, a Rig Data will be generated automatically at runtime.|Create a <b>Rig Data</b> to add custom settings. Otherwise, a Rig Data will be generated automatically at runtime.|
+skinWeights|Skin Weights|Specifies the maximum number of bone influences per vertex. This setting affects how vertex skinning is calculated and can impact both visual fidelity and performance.|Specifies the maximum number of bone influences per vertex. This setting affects how vertex skinning is calculated and can impact both visual fidelity and performance.|
+crowdPrefab|Crowd Prefab|||
+animationClip|Animation Clip|||
+normalizedTriggerTime|Normalized Trigger Time|||
+floatParam|Float|||
+intParam|Integer|||
+stringParam|String|||
+mecanimReaderMaxDelay|Max Delay|The Mecanim Reader workflow checks the states of a limited number of instances each frame. By setting the Max Delay value, you limit the number of frames an instance can go without being read. If set to 1 or lower, Mecanim Reader will read the states of all instances every frame.|The Mecanim Reader workflow checks the states of a limited number of instances each frame. By setting the Max Delay value, you limit the number of frames an instance can go without being read. If set to 1 or lower, Mecanim Reader will read the states of all instances every frame.|
+mecanimReaderMinReadCount|Min Read|This value determines the minimum number of instances that the Mecanim Reader workflow should read each frame.|This value determines the minimum number of instances that the Mecanim Reader workflow should read each frame.|
+legacyReaderMaxDelay|Max Delay|The Legacy Animation Reader workflow checks the states of a limited number of instances each frame. By setting the Max Delay value, you limit the number of frames an instance can go without being read. If set to 1 or lower, Legacy Reader will read the states of all instances every frame.|The Legacy Animation Reader workflow checks the states of a limited number of instances each frame. By setting the Max Delay value, you limit the number of frames an instance can go without being read. If set to 1 or lower, Legacy Reader will read the states of all instances every frame.|
+legacyReaderMinReadCount|Min Read|This value determines the minimum number of instances that the Legacy Animation Reader workflow should read each frame.\n|This value determines the minimum number of instances that the Legacy Animation Reader workflow should read each frame.\n|
+serializedClipData|Baked Data Asset|||
+serializedClips|Serialized Clips|||
+clipsToSerialize|Clips To Bake|||

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbee6a24366d230469e0c5eb6f5ecf9a, type: 3}
+  m_Name: Chomper_GPUIVariationDefinition
+  m_EditorClassIdentifier: 
+  material: {fileID: 2100000, guid: 45a468661add33649a871fc87ae36c28, type: 2}
+  replacementShader: {fileID: 4800000, guid: 5ae6a0846585336479f6eca06cf53007, type: 3}
+  bufferName: variationBuffer
+  items:
+  - propertyName: _BaseColor
+    variationType: 1
+    defaultValue: {x: 1, y: 1, z: 1, w: 1}
+  shaderIncludeFile: {fileID: 10900000, guid: 10937658f141dad4488034f8829c7bfa, type: 3}
+  isCrowdAnimations: 1

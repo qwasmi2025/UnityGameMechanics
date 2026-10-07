@@ -1,0 +1,21 @@
+{
+    "name": "GPUInstancerPro.CrowdAnimations.Editor",
+    "rootNamespace": "GPUInstancerPro.CrowdAnimations",
+    "references": [
+        "GUID:3b7622431700fb240ae5afd170731645",
+        "GUID:5dffeef69173e0b4f889c9771b98dee7",
+        "GUID:a10fef16726db7c478d8cfa0a0b6f2d2",
+        "GUID:e0cd26848372d4e5c891c569017e11f1"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

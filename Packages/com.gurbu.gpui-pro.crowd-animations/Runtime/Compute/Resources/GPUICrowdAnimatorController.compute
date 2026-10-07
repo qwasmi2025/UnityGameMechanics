@@ -1,0 +1,87 @@
+﻿// GPU Instancer Pro
+// Copyright (c) GurBu Technologies
+
+#include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/PlatformDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/Matrix.hlsl"
+#include "Packages/com.gurbu.gpui-pro.crowd-animations/Runtime/Compute/Include/GPUICrowdDefines.hlsl"
+
+#pragma kernel CSCrowdAnimatorController
+#pragma kernel CSFixClipWeights
+
+// Output
+uniform RWStructuredBuffer<float4> clipFramesAndWeightsBuffer; // index 0: frameNo1-4
+                                                             // index 1: weight1-4
+// Inputs
+uniform StructuredBuffer<GPUICrowdAnimatorClipData> crowdAnimatorClipBuffer; // 4 per instance
+uniform StructuredBuffer<GPUICrowdInstanceData> crowdInstanceBuffer;
+uniform uint instanceCount;
+uniform uint startIndex;
+uniform float currentTime;
+
+[numthreads(GPUI_THREADS, 1, 1)]
+void CSCrowdAnimatorController(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= instanceCount)
+        return;
+    int index = id.x + startIndex;
+    if (!GPUI_CROWD_IsGPUAnimator(crowdInstanceBuffer[index].animatorWorkflowID))
+        return;
+    
+    uint activeClipsIndex = index * 2;
+    float4 activeClipWeights = clipFramesAndWeightsBuffer[activeClipsIndex + 1];
+    if (length(activeClipWeights) <= 0)
+        return;
+    
+    float4 activeClipFrames = float4(-1, -1, -1, -1);
+    uint animatorIndex = index * 4;
+    
+    [unroll]
+    for (uint i = 0; i < 4; i++)
+    {
+        if (activeClipWeights[i] > 0.001)
+        {
+            GPUICrowdAnimatorClipData animatorClipData = crowdAnimatorClipBuffer[animatorIndex + i];
+            float clipCurrentTime = currentTime - animatorClipData.clipStartTime;
+            if (clipCurrentTime >= 0.0)
+            {
+                int isLooping = sign(animatorClipData.packedFrameCountLoopAndSpeed);
+                int clipFrameCount = (((animatorClipData.packedFrameCountLoopAndSpeed * isLooping) >> 16) & 0x7FFF) - 1;
+                int frameStartIndex = animatorClipData.packedFrameStartAndBakedClipIndex >> 12;
+                float speededClipLength = abs(animatorClipData.packedSpeedRelativeLengthAndSync);
+                if (isLooping < 0 && clipCurrentTime >= speededClipLength)
+                    activeClipFrames[i] = frameStartIndex + clipFrameCount; // Assign last frame, if not looping and animation ended.
+                else
+                    activeClipFrames[i] = frameStartIndex + frac(clipCurrentTime / speededClipLength) * clipFrameCount;
+            }
+        }
+    }
+    
+    clipFramesAndWeightsBuffer[activeClipsIndex] = activeClipFrames;
+}
+
+[numthreads(GPUI_THREADS, 1, 1)]
+void CSFixClipWeights(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= instanceCount)
+        return;
+    int index = id.x + startIndex;
+    if (!GPUI_CROWD_IsGPUAnimator(crowdInstanceBuffer[index].animatorWorkflowID))
+        return;
+    
+    uint weightIndex = index * 2 + 1;
+    
+    float4 weightData = clipFramesAndWeightsBuffer[weightIndex];
+    float totalWeight = weightData.x + weightData.y + weightData.z + weightData.w;
+    if (totalWeight == 0)
+        return;
+    
+    if (totalWeight <= 0)
+        weightData = float4(1, 0, 0, 0);
+    else
+    {
+        totalWeight = 1.0 / totalWeight;
+        weightData *= float4(totalWeight, totalWeight, totalWeight, totalWeight);
+    }
+
+    clipFramesAndWeightsBuffer[weightIndex] = weightData;
+}

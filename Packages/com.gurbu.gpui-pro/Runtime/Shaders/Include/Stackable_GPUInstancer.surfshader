@@ -1,0 +1,8 @@
+BEGIN_OPTIONS
+    Stackable"False"
+END_OPTIONS
+
+BEGIN_CODE
+    #include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Shaders/Include/GPUInstancerSetup.hlsl"
+    #pragma instancing_options procedural:setupGPUI
+END_CODE

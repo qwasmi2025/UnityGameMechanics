@@ -1,0 +1,71 @@
+﻿// GPU Instancer Pro
+// Copyright (c) GurBu Technologies
+
+#include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/PlatformDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/GPUIDefines.hlsl"
+
+#pragma multi_compile _ GPUI_SHADOWCASTING
+
+#ifdef __INTELLISENSE__
+#define GPUI_SHADOWCASTING
+#endif 
+
+#pragma kernel CSSetOptionalRendererInstanceData
+
+RWStructuredBuffer<GPUIVisibilityData> visibilityBuffer;
+RWStructuredBuffer<float4> gpuiInstanceDataBuffer;
+RWStructuredBuffer<uint> optionalRendererStatusBuffer;
+// x=> bufferSize, y => visibilityBufferIndex, z => optionalRendererCount, w => 
+uniform uint4 sizeAndIndexes;
+
+[numthreads(GPUI_THREADS_2D, GPUI_THREADS_2D, 1)]
+void CSSetOptionalRendererInstanceData(uint3 id : SV_DispatchThreadID)
+{
+    uint instanceDataIndex = id.x;
+    uint optionalRendererIndex = id.y;
+    uint bufferSize = sizeAndIndexes.x;
+    uint optionalRendererCount = sizeAndIndexes.z;
+    if (instanceDataIndex >= bufferSize || optionalRendererIndex >= optionalRendererCount)
+        return;
+    uint bitIndex = id.y % 32;
+    uint numORStatusPerIndex = (optionalRendererCount - 1) / 32 + 1;
+    
+#ifdef GPUI_SHADOWCASTING
+    uint instanceDataShiftMultiplier = 2;
+#else
+    uint instanceDataShiftMultiplier = 1;
+#endif
+    
+    uint visibilityBufferIndex = sizeAndIndexes.y;
+    uint optionalRendererVisibilityBufferIndex = visibilityBufferIndex + (optionalRendererIndex + 1) * 2;
+    GPUIVisibilityData visibilityData = visibilityBuffer[visibilityBufferIndex];
+    if (instanceDataIndex < visibilityData.visibleCount)
+    {
+        float4 instanceData = gpuiInstanceDataBuffer[instanceDataIndex];
+        uint instanceIndex = asuint(instanceData.x);
+        
+        uint optionalRendererStatus = optionalRendererStatusBuffer[instanceIndex * numORStatusPerIndex + id.y / 32];
+        if ((optionalRendererStatus & (1u << bitIndex)) != 0)
+        {
+            uint index;
+            InterlockedAdd(visibilityBuffer[optionalRendererVisibilityBufferIndex].visibleCount, 1, index);
+            gpuiInstanceDataBuffer[bufferSize * instanceDataShiftMultiplier * (optionalRendererIndex + 1) + index] = instanceData;
+        }
+    }
+#ifdef GPUI_SHADOWCASTING
+    visibilityData = visibilityBuffer[visibilityBufferIndex + 1];
+    if (instanceDataIndex < visibilityData.visibleCount)
+    {
+        float4 instanceData = gpuiInstanceDataBuffer[instanceDataIndex + bufferSize];
+        uint instanceIndex = asuint(instanceData.x);
+        
+        uint optionalRendererStatus = optionalRendererStatusBuffer[instanceIndex * numORStatusPerIndex + id.y / 32];
+        if ((optionalRendererStatus & (1u << bitIndex)) != 0)
+        {
+            uint index;
+            InterlockedAdd(visibilityBuffer[optionalRendererVisibilityBufferIndex + 1].visibleCount, 1, index);
+            gpuiInstanceDataBuffer[bufferSize * (instanceDataShiftMultiplier * (optionalRendererIndex + 1) + 1) + index] = instanceData;
+        }
+    }
+#endif
+}

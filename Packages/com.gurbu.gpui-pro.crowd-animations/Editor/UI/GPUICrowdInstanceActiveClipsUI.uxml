@@ -1,0 +1,34 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.gurbu.gpui-pro/Editor/UI/GPUIEditorStyle.uss?fileID=7433441132597879392&amp;guid=a2a4445c56ecf5c47947568de4aa6d27&amp;type=3#GPUIEditorStyle" />
+    <Style src="project://database/Packages/com.gurbu.gpui-pro.crowd-animations/Editor/UI/GPUICrowdEditorStyle.uss?fileID=7433441132597879392&amp;guid=831b1278044b5064783069e5a36fb3cf&amp;type=3#GPUICrowdEditorStyle" />
+    <ui:VisualElement name="ActiveClipsVE" style="flex-direction: row; margin-top: 10px;">
+        <ui:VisualElement name="ClipsVE" style="min-width: 150px;">
+            <ui:Label tabindex="-1" text="Active Clips" style="-unity-text-align: middle-center; -unity-font-style: bold;" />
+            <uie:ObjectField name="Clip1OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <uie:ObjectField name="Clip2OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <uie:ObjectField name="Clip3OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <uie:ObjectField name="Clip4OF" allow-scene-objects="false" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="WeightsVE" style="margin-left: 10px; min-width: 120px;">
+            <ui:Label tabindex="-1" text="Weights" style="-unity-text-align: middle-center; min-width: 40px; -unity-font-style: bold;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip1Weight" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip2Weight" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip3Weight" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip4Weight" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="TimeVE" style="flex-grow: 1; margin-left: 10px;">
+            <ui:Label tabindex="-1" text="Time" style="-unity-text-align: middle-center; min-width: 40px; -unity-font-style: bold;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip1Time" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip2Time" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip3Time" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+            <ui:Slider high-value="1" show-input-field="true" name="Clip4Time" focusable="false" style="height: 20px; max-height: 20px; min-height: 20px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="SpeedsVE" style="max-width: 50px; margin-left: 10px; min-width: 30px;">
+            <ui:Label tabindex="-1" text="S" style="-unity-text-align: middle-center; min-width: 30px; -unity-font-style: bold;" />
+            <ui:FloatField name="Speed1" style="height: 20px; max-height: 20px; min-height: 20px; margin-left: 0; margin-right: 0;" />
+            <ui:FloatField name="Speed2" style="height: 20px; max-height: 20px; min-height: 20px; margin-left: 0; margin-right: 0;" />
+            <ui:FloatField name="Speed3" style="height: 20px; max-height: 20px; min-height: 20px; margin-left: 0; margin-right: 0;" />
+            <ui:FloatField name="Speed4" style="height: 20px; max-height: 20px; min-height: 20px; margin-left: 0; margin-right: 0;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

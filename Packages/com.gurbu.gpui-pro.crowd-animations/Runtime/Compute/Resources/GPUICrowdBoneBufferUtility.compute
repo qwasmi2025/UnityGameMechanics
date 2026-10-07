@@ -1,0 +1,79 @@
+﻿// GPU Instancer Pro
+// Copyright (c) GurBu Technologies
+
+#include_with_pragmas "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/PlatformDefines.hlsl"
+#include "Packages/com.gurbu.gpui-pro/Runtime/Compute/Include/Matrix.hlsl"
+#include "Packages/com.gurbu.gpui-pro.crowd-animations/Runtime/Compute/Include/GPUICrowdDefines.hlsl"
+
+/// Converts position rotation and scale to transformation matrix and writes to buffer
+#pragma kernel CSBoneDataToMatrix
+#pragma kernel CSCopyFromSource
+#pragma kernel CSSetDefaultBoneDataFromBindPose
+#pragma kernel CSSetDefaultBoneDataFromBindPoseFiltered
+
+// Output
+uniform RWStructuredBuffer<float4> shaderBoneBuffer;
+uniform RWStructuredBuffer<GPUITransformData> boneDataBuffer;
+uniform RWStructuredBuffer<float4x4> bindPoseBuffer;
+
+// Inputs
+uniform StructuredBuffer<GPUITransformData> sourceBuffer;
+uniform StructuredBuffer<int2> statusBuffer;
+uniform StructuredBuffer<int> filterBuffer;
+uniform uint count;
+uniform uint startIndex;
+uniform uint bindPoseNo;
+uniform uint boneCount;
+
+[numthreads(GPUI_THREADS, 1, 1)]
+void CSBoneDataToMatrix(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= count)
+        return;
+
+    GPUITransformData transformData = boneDataBuffer[id.x];
+    float4x4 animMatrix = CreateTransformationMatrix(transformData.position, transformData.rotation, transformData.scale);
+    
+    float4x4 bindPose = bindPoseBuffer[(id.x % boneCount) + boneCount * bindPoseNo];
+
+    float4x4 finalMatrix = mul(animMatrix, bindPose);
+        
+    uint index = (id.x + count * bindPoseNo) * 3 + startIndex;
+    shaderBoneBuffer[index] = finalMatrix._11_12_13_14;
+    index++;
+    shaderBoneBuffer[index] = finalMatrix._21_22_23_24;
+    index++;
+    shaderBoneBuffer[index] = finalMatrix._31_32_33_34;
+    // index++;
+    //shaderBoneBuffer[index] = finalMatrix._41_42_43_44;
+}
+
+[numthreads(GPUI_THREADS, 1, 1)]
+void CSCopyFromSource(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= count)
+        return;
+    int2 status = statusBuffer[id.x];
+    if (status.y != 1 || status.x < 0)
+        return;
+    boneDataBuffer[startIndex + status.x] = sourceBuffer[id.x];
+}
+
+[numthreads(GPUI_THREADS, 1, 1)]
+void CSSetDefaultBoneDataFromBindPose(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= count)
+        return;
+    
+    boneDataBuffer[id.x + startIndex] = sourceBuffer[id.x % boneCount];
+}
+
+[numthreads(GPUI_THREADS, 1, 1)]
+void CSSetDefaultBoneDataFromBindPoseFiltered(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= count)
+        return;
+    int index = filterBuffer[id.x / boneCount];
+    int boneIndex = id.x % boneCount;
+    boneDataBuffer[index * boneCount + boneIndex] = sourceBuffer[boneIndex];
+}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/GitProjects/Unity/TLOU2/ProjectSettings/**)",
+      "Read(//d/GitProjects/Unity/TLOU2/Packages/**)",
+      "Read(//d/GitProjects/Unity/TLOU2/Assets/**)"
+    ]
+  }
+}
